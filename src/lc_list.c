@@ -67,12 +67,12 @@ list	_lst_new(const size_t size, const size_t count, void (*_free)(void *)) {
 			free(out);
 			return NULL;
 		}
+		out->free = (_free != free) ? _free : (void (*)(void *))__free;
 		out->element_size = size;
 		out->highest_index = 0;
 		out->elements = 0;
 		out->first = 0;
 		out->last = 0;
-		out->free = (_free != free) ? _free : (void (*)(void *))__free;
 	}
 	return out;
 }
