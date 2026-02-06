@@ -1,0 +1,10 @@
+*.a
+*.o
+*.so
+bin
+*.log
+*.out*
+*.txt
+.cache
+.clangd
+compile_commands.json
