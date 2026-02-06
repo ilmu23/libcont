@@ -35,9 +35,9 @@ void	_dar_pop(darray arr);
 
 #define darray_first(darray)	(_dar_get(darray, 0))
 #define darray_start(darray)	(darray_first(darray))
-#define darray_last(darray)	(_dar_get(darray, (size_t)-1))
-#define darray_end(darray)	(darray_last(darray))
-#define darray_get(darray)	(_dar_get(darray, i))
+#define darray_last(darray)		(_dar_get(darray, (size_t)-1))
+#define darray_end(darray)		(darray_last(darray))
+#define darray_get(darray, i)	(_dar_get(darray, i))
 void	*_dar_get(cdarray arr, const size_t i);
 
 #define darray_set(darray, i, value)		(_dar_set(darray, i, (const void *)&value, 0))
