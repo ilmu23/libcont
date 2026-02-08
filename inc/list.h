@@ -27,10 +27,10 @@ list	_lst_new(const size_t size, const size_t count, void (*free)(void *));
 #define list_delete(list)	(_lst_del(list))
 void	_lst_del(list list);
 
-#define list_push_front(list, value)	(_lst_psh_f(list, (const void *)&value));
+#define list_push_front(list, value)	(_lst_psh_f(list, (const void *)&value))
 uint8_t	_lst_psh_f(list list, const void *val);
 
-#define list_push_back(list, value)	(_lst_psh_b(list, (const void *)&value));
+#define list_push_back(list, value)	(_lst_psh_b(list, (const void *)&value))
 uint8_t	_lst_psh_b(list list, const void *val);
 
 #define list_pop_front(list)	(_lst_pop_f(list))
@@ -74,7 +74,7 @@ size_t	_lst_sze(clist list, const uint8_t real);
 #define list_capacity(list)	(_lst_cap(list))
 size_t	_lst_cap(clist list);
 
-#define list_resize(list)	(_lst_rsz(list, size))
+#define list_resize(list, size)	(_lst_rsz(list, size))
 uint8_t	_lst_rsz(list list, const size_t size);
 
 #define list_shrink_to_fit(list)	(_lst_stf(list))

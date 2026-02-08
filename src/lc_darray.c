@@ -39,7 +39,7 @@ darray	_dar_new(const size_t size, const size_t count, void (*_free)(void *)) {
 			free(out);
 			return NULL;
 		}
-		out->free = (_free != free) ? free : (void (*)(void *))__free;
+		out->free = (_free != free) ? _free : (void (*)(void *))__free;
 		out->element_size = size;
 		out->capacity = count;
 		out->elements = 0;

@@ -63,7 +63,7 @@ uint8_t	_dar_stf(darray arr);
 #define darray_clear(darray)	(_dar_clr(darray))
 void	_dar_clr(darray arr);
 
-#define darray_insert(darray, i, value)				(_dar_ins(darray, i, 1), (const void *)&value)
+#define darray_insert(darray, i, value)				(_dar_ins(darray, i, 1, (const void *)&value))
 #define darray_insert_n(darray, start, n, values)	(_dar_ins(darray, start, n, (const void *)values))
 uint8_t	_dar_ins(darray arr, const size_t i, const size_t n, const void *vals);
 
