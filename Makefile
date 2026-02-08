@@ -55,33 +55,33 @@ static: $(STATIC)
 shared: $(SHARED)
 
 install: $(STATIC) $(SHARED)
-	@printf "\e[1;38;5;85mTI42 >\e[m Installing ti42\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Installing libcont\n"
 	@mkdir -p $(INSTALL_PATH)/lib
 	@cp $(STATIC) $(SHARED) $(INSTALL_PATH)/lib/
-	@printf "\e[1;38;5;85mTI42 >\e[m \e[1mDone!\e[m\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m \e[1mDone!\e[m\n"
 
 install-headers:
-	@printf "\e[1;38;5;85mTI42 >\e[m Installing headers\n"
-	@mkdir -p $(INSTALL_PATH)/include/ti42
-	@cp $(STATIC) $(SHARED) $(INSTALL_PATH)/include/ti42/
-	@printf "\e[1;38;5;85mTI42 >\e[m \e[1mDone!\e[m\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Installing headers\n"
+	@mkdir -p $(INSTALL_PATH)/include/libcont
+	@cp -r $(INCDIR)/* $(INSTALL_PATH)/include/libcont/
+	@printf "\e[1;38;5;166mLIBCONT >\e[m \e[1mDone!\e[m\n"
 
 $(STATIC): $(OBJDIR) $(OBJS)
-	@printf "\e[1;38;5;85mTI42 >\e[m Creating %s\n" $@
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Creating %s\n" $@
 	@ar -crs $@ $(OBJS)
-	@printf "\e[1;38;5;85mTI42 >\e[m \e[1mDone!\e[m\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m \e[1mDone!\e[m\n"
 
 $(SHARED): $(OBJDIR) $(OBJS)
-	@printf "\e[1;38;5;85mTI42 >\e[m Linking %s\n" $@
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Linking %s\n" $@
 	@$(LD) $(LDFLAGS) $(OBJS) -o $@
-	@printf "\e[1;38;5;85mTI42 >\e[m \e[1mDone!\e[m\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m \e[1mDone!\e[m\n"
 
 $(OBJDIR):
-	@printf "\e[1;38;5;85mTI42 >\e[m Creating objdir\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Creating objdir\n"
 	@mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@printf "\e[1;38;5;85mTI42 >\e[m Compiling %s\n" $@
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Compiling %s\n" $@
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
@@ -95,8 +95,8 @@ fclean: clean
 re: fclean all
 
 db:
-	@printf "\e[1;38;5;85mTI42 >\e[m Creating compilation command database\n" $@
+	@printf "\e[1;38;5;166mLIBCONT >\e[m Creating compilation command database\n" $@
 	@compiledb make --no-print-directory BUILD=$(BUILD) cflags.extra=$(cflags.extra) | sed -E '/^##.*\.\.\.$$|^[[:space:]]*$$/d'
-	@printf "\e[1;38;5;85mTI42 >\e[m \e[1mDone!\e[m\n"
+	@printf "\e[1;38;5;166mLIBCONT >\e[m \e[1mDone!\e[m\n"
 
 .PHONY: all static shared install install-headers clean fclean re db
