@@ -28,7 +28,8 @@ map	_map_new(const size_t size, const size_t count, const map_key_type type, voi
 #define map_delete(map)	(_map_del(map))
 void	_map_del(map map);
 
-#define map_get(map, key)	(_map_get(map, (const uintptr_t)key))
+#define map_get(map, key)			(_map_get(map, (const uintptr_t)key))
+#define map_get_t(type, map, key)	(*(type *)_map_get(map, (const uinptr_t)key));
 void	*_map_get(cmap map, const uintptr_t key);
 
 #define map_set(map, key, value)	(_map_set(map, (const uintptr_t)key, (const void *)&value))

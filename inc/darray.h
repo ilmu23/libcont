@@ -33,11 +33,16 @@ uint8_t	_dar_psh(darray arr, const void *val);
 #define darray_pop(darray)	(_dar_pop(darray))
 void	_dar_pop(darray arr);
 
-#define darray_first(darray)	(_dar_get(darray, 0))
-#define darray_start(darray)	(darray_first(darray))
-#define darray_last(darray)		(_dar_get(darray, (size_t)-1))
-#define darray_end(darray)		(darray_last(darray))
-#define darray_get(darray, i)	(_dar_get(darray, i))
+#define darray_first(darray)			(_dar_get(darray, 0))
+#define darray_first_t(type, darray)	(*(type *)_dar_get(darray, 0))
+#define darray_start(darray)			(darray_first(darray))
+#define darray_start_t(type, darray)	(*(type *)darray_first(darray))
+#define darray_last(darray)				(_dar_get(darray, (size_t)-1))
+#define darray_last_t(type, darray)		(*(type *)_dar_get(darray, (size_t)-1))
+#define darray_end(darray)				(darray_last(darray))
+#define darray_end_t(type, darray)		(*(type *)darray_last(darray))
+#define darray_get(darray, i)			(_dar_get(darray, i))
+#define darray_get_t(type, darray, i)	(*(type *)_dar_get(darray, i))
 void	*_dar_get(cdarray arr, const size_t i);
 
 #define darray_set(darray, i, value)		(_dar_set(darray, i, (const void *)&value, 0))
