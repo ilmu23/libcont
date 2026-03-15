@@ -11,14 +11,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "alloc.h"
 #include "darray.h"
 
 struct _darray {
-	void	(*free)(void *);
-	size_t	element_size;
-	size_t	capacity;
-	size_t	elements;
-	uint8_t	*data;
+	lc_freer	free;
+	uint8_t		*data;
+	size_t		element_size;
+	size_t		capacity;
+	size_t		elements;
 };
 
 #define min(x, y)	(((x) < (y)) ? (x) : (y))
@@ -27,16 +28,16 @@ struct _darray {
 
 static inline void	_set_element(darray arr, const size_t i, const void *val);
 
-static void	__free(void **blk) { free(*blk); }
+static void	__free(void **blk) { lc_free(*blk); }
 
 darray	_dar_new(const size_t size, const size_t count, void (*_free)(void *)) {
 	darray	out;
 
-	out = (size) ? malloc(sizeof(*out)) : NULL;
+	out = (size) ? lc_malloc(sizeof(*out)) : NULL;
 	if (out) {
-		out->data = malloc(size * count);
+		out->data = lc_malloc(size * count);
 		if (!out->data) {
-			free(out);
+			lc_free(out);
 			return NULL;
 		}
 		_dar_fre(out, _free);
@@ -50,12 +51,12 @@ darray	_dar_new(const size_t size, const size_t count, void (*_free)(void *)) {
 darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, void *(*cpy)(void *)) {
 	darray	out;
 
-	out = malloc(sizeof(*out));
+	out = lc_malloc(sizeof(*out));
 	if (out) {
 		out->capacity = (end - start < arr->capacity) ? end - start : arr->capacity;
-		out->data = malloc(arr->element_size * ((out->capacity) ? out->capacity : 1));
+		out->data = lc_malloc(arr->element_size * ((out->capacity) ? out->capacity : 1));
 		if (!out->data) {
-			free(out);
+			lc_free(out);
 			return NULL;
 		}
 		out->elements = (cpy) ? 0 : (arr->elements > out->capacity) ? out->capacity : arr->elements;
@@ -77,8 +78,8 @@ void	_dar_del(darray arr) {
 	if (arr) {
 		if (arr->elements)
 			_dar_clr(arr);
-		free(arr->data);
-		free(arr);
+		lc_free(arr->data);
+		lc_free(arr);
 	}
 }
 
@@ -101,10 +102,10 @@ void	*_dar_get(cdarray arr, const size_t i) {
 	return (i < arr->elements) ? index(arr, i) : (i == (size_t)-1 && arr->elements) ? index(arr, arr->elements - 1) : DARRAY_OUT_OF_BOUNDS;
 }
 
-uint8_t	_dar_set(darray arr, const size_t i, const void *val, const uint8_t free) {
+uint8_t	_dar_set(darray arr, const size_t i, const void *val, const uint8_t lc_free) {
 	if (i >= arr->elements)
 		return 0;
-	if (free && arr->free)
+	if (lc_free && arr->free)
 		arr->free(index(arr, i));
 	_set_element(arr, i, val);
 	return 1;
@@ -139,7 +140,7 @@ uint8_t	_dar_rsz(darray arr, const size_t size) {
 		arr->free(index(arr, --arr->elements));
 	while (size < arr->elements);
 	arr->capacity = size;
-	arr->data = realloc(arr->data, arr->capacity * arr->element_size);
+	arr->data = lc_realloc(arr->data, arr->capacity * arr->element_size);
 	return (arr->data) ? 1 : 0;
 }
 
@@ -155,7 +156,7 @@ void	_dar_fea(darray arr, void (*fn)(void *)) {
 }
 
 void	_dar_fre(darray arr, void (*_free)(void *)) {
-	arr->free = (_free != free) ? _free : (void (*)(void *))__free;
+	arr->free = (_free != lc_free) ? _free : (void (*)(void *))__free;
 }
 
 void	_dar_clr(darray arr) {

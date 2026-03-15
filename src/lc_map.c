@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "map.h"
+#include "alloc.h"
 
 #define _DELETED	((void *)2)
 
@@ -28,11 +29,11 @@ typedef struct {
 }	pair;
 
 struct _map {
-	void			(*free)(void *);
+	map_key_type	key_type;
+	lc_freer		free;
 	size_t			element_size;
 	size_t			elements;
 	size_t			capacity;
-	map_key_type	key_type;
 	pair			**data;
 };
 
@@ -46,11 +47,11 @@ static void	__free(void **blk);
 map	_map_new(const size_t size, const size_t count, const map_key_type type, void (*_free)(void *)) {
 	map	out;
 
-	out = (size) ? malloc(sizeof(*out)) : NULL;
+	out = (size) ? lc_malloc(sizeof(*out)) : NULL;
 	if (out) {
-		out->data = calloc(count, sizeof(*out->data));
+		out->data = lc_calloc(count, sizeof(*out->data));
 		if (!out->data) {
-			free(out);
+			lc_free(out);
 			return NULL;
 		}
 		_map_fre(out, _free);
@@ -65,8 +66,8 @@ map	_map_new(const size_t size, const size_t count, const map_key_type type, voi
 void	_map_del(map map) {
 	if (map) {
 		_map_clr(map);
-		free(map->data);
-		free(map);
+		lc_free(map->data);
+		lc_free(map);
 	}
 }
 
@@ -88,7 +89,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 	while (in_use(map->data[i]))
 		wraparound_increment(i, map->capacity - 1);
 	if (!in_use(map->data[i])) {
-		map->data[i] = malloc(sizeof(*map->data[i]) + map->element_size);
+		map->data[i] = lc_malloc(sizeof(*map->data[i]) + map->element_size);
 		if (!map->data[i])
 			return 0;
 	}
@@ -106,7 +107,7 @@ uint8_t	_map_ers(map map, const uintptr_t key) {
 		return 0;
 	if (map->free)
 		map->free(map->data[i]->val);
-	free(map->data[i]);
+	lc_free(map->data[i]);
 	map->data[i] = _DELETED;
 	map->elements--;
 	return 1;
@@ -130,7 +131,7 @@ void	_map_fea(map map, void (*fn)(void *)) {
 }
 
 void	_map_fre(map map, void (*_free)(void *)) {
-	map->free = (_free != free) ? _free : (void (*)(void *))__free;
+	map->free = (_free != lc_free) ? _free : (void (*)(void *))__free;
 }
 
 void	_map_clr(map map) {
@@ -140,7 +141,7 @@ void	_map_clr(map map) {
 		if (in_use(map->data[i])) {
 			if (map->free)
 				map->free(map->data[i]->val);
-			free(map->data[i]);
+			lc_free(map->data[i]);
 			map->data[i] = _DELETED;
 			if (!--map->elements)
 				break ;
@@ -178,7 +179,7 @@ static inline uint8_t	_grow(map map) {
 	pair	**new_data;
 
 	new_capacity = map->capacity * 2;
-	new_data = calloc(new_capacity, sizeof(*new_data));
+	new_data = lc_calloc(new_capacity, sizeof(*new_data));
 	if (!new_data)
 		return 0;
 	for (i = 0; i < map->capacity; i++) {
@@ -189,7 +190,7 @@ static inline uint8_t	_grow(map map) {
 			new_data[j] = map->data[i];
 		}
 	}
-	free(map->data);
+	lc_free(map->data);
 	map->capacity = new_capacity;
 	map->data = new_data;
 	return 1;
@@ -205,5 +206,5 @@ static inline size_t	_find_pair(cmap map, const uintptr_t key) {
 }
 
 static void	__free(void **blk) {
-	free(*blk);
+	lc_free(*blk);
 }

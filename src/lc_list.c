@@ -14,6 +14,7 @@
 
 
 #include "list.h"
+#include "alloc.h"
 #include "darray.h"
 
 #define _INDEX_NONE	SIZE_MAX
@@ -27,8 +28,8 @@
 #define remove_deleted(list, e)	if (e) do darray_pop(list->data); while(get_node_i(list, --list->highest_index)->delete)
 
 typedef struct {
-	void				(*free)(void *);
 	struct _lst_node	node;
+	lc_freer			free;
 	size_t				index;
 	size_t				next;
 	size_t				prev;
@@ -36,13 +37,13 @@ typedef struct {
 }	__lst_node;
 
 struct _lst {
-	void	(*free)(void *);
-	size_t	highest_index;
-	size_t	element_size;
-	size_t	elements;
-	size_t	first;
-	size_t	last;
-	darray	data;
+	lc_freer	free;
+	size_t		highest_index;
+	size_t		element_size;
+	size_t		elements;
+	size_t		first;
+	size_t		last;
+	darray		data;
 };
 
 static struct {
@@ -60,11 +61,11 @@ list	_lst_new(const size_t size, const size_t count, void (*_free)(void *)) {
 
 	if (!_alloca_size.set)
 		_set_alloca_max();
-	out = (size) ? malloc(sizeof(*out)) : NULL;
+	out = (size) ? lc_malloc(sizeof(*out)) : NULL;
 	if (out) {
 		out->data = darray(__lst_node, count, (void (*)(void *))_free_node);
 		if (!out->data) {
-			free(out);
+			lc_free(out);
 			return NULL;
 		}
 		_lst_fre(out, _free);
@@ -81,7 +82,7 @@ void	_lst_del(list list) {
 	if (list) {
 		_lst_clr(list);
 		darray_delete(list->data);
-		free(list);
+		lc_free(list);
 	}
 }
 
@@ -95,7 +96,7 @@ uint8_t	_lst_psh_f(list list, const void *val) {
 		.delete = 0,
 		.next = _INDEX_NONE,
 		.prev = _INDEX_NONE,
-		.node.data = malloc(list->element_size)
+		.node.data = lc_malloc(list->element_size)
 	};
 	if (!new.node.data)
 		return 0;
@@ -113,7 +114,7 @@ uint8_t	_lst_psh_f(list list, const void *val) {
 		list->first = new.index;
 		list->elements++;
 	} else
-		free(new.node.data);
+		lc_free(new.node.data);
 	return rv;
 }
 
@@ -127,7 +128,7 @@ uint8_t	_lst_psh_b(list list, const void *val) {
 		.delete = 0,
 		.next = _INDEX_NONE,
 		.prev = _INDEX_NONE,
-		.node.data = malloc(list->element_size)
+		.node.data = lc_malloc(list->element_size)
 	};
 	if (!new.node.data)
 		return 0;
@@ -145,7 +146,7 @@ uint8_t	_lst_psh_b(list list, const void *val) {
 		list->last = new.index;
 		list->elements++;
 	} else
-		free(new.node.data);
+		lc_free(new.node.data);
 	return rv;
 }
 
@@ -226,7 +227,7 @@ uint8_t	_lst_ins_b(list list, const list_node ref, const void *val) {
 	new = (__lst_node){
 		.free = list->free,
 		.delete = 0,
-		.node.data = malloc(list->element_size)
+		.node.data = lc_malloc(list->element_size)
 	};
 	if (!new.node.data)
 		return 0;
@@ -245,7 +246,7 @@ uint8_t	_lst_ins_b(list list, const list_node ref, const void *val) {
 			list->first = new.index;
 		list->elements++;
 	} else
-		free(new.node.data);
+		lc_free(new.node.data);
 	return rv;
 }
 
@@ -257,7 +258,7 @@ uint8_t	_lst_ins_a(list list, const list_node ref, const void *val) {
 	new = (__lst_node){
 		.free = list->free,
 		.delete = 0,
-		.node.data = malloc(list->element_size)
+		.node.data = lc_malloc(list->element_size)
 	};
 	if (!new.node.data)
 		return 0;
@@ -276,7 +277,7 @@ uint8_t	_lst_ins_a(list list, const list_node ref, const void *val) {
 			list->last = new.index;
 		list->elements++;
 	} else
-		free(new.node.data);
+		lc_free(new.node.data);
 	return rv;
 }
 
@@ -377,7 +378,7 @@ uint8_t	_lst_rsz(list list, const size_t size) {
 	vec_size = darray_size(list->data);
 	if (size < vec_size) {
 		tmp_size = vec_size * sizeof(*tmp);
-		tmp = (tmp_size < _alloca_size.max) ? alloca(tmp_size) : malloc(tmp_size);
+		tmp = (tmp_size < _alloca_size.max) ? alloca(tmp_size) : lc_malloc(tmp_size);
 		if (!tmp)
 			return 0;
 		for (i = 0, node = darray_get(list->data, list->first); i < vec_size; node = darray_get(list->data, node->next))
@@ -413,7 +414,7 @@ void	_lst_fea(list list, void (*fn)(void *)) {
 }
 
 void	_lst_fre(list list, void (*_free)(void *)) {
-	list->free = (_free != free) ? _free : (void (*)(void *))__free;
+	list->free = (_free != lc_free) ? _free : (void (*)(void *))__free;
 }
 
 void	_lst_clr(list list) {
@@ -435,9 +436,9 @@ static inline void	_set_alloca_max(void) {
 static void	_free_node(__lst_node *node) {
 	if (node->free)
 		node->free(node->node.data);
-	free(node->node.data);
+	lc_free(node->node.data);
 }
 
 static void	__free(void **blk) {
-	free(*blk);
+	lc_free(*blk);
 }

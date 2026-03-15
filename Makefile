@@ -38,7 +38,8 @@ INSTALL_PATH	=	/usr
 
 ## SOURCE FILES
 
-FILES	=	lc_darray.c \
+FILES	=	lc_alloc.c \
+			lc_darray.c \
 			lc_list.c \
 			lc_map.c
 
