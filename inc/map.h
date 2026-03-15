@@ -47,5 +47,8 @@ uint8_t	_map_ety(cmap map);
 #define map_foreach(map, fn)	(_map_fea(map, fn))
 void	_map_fea(map map, void (*fn)(void *));
 
+#define map_set_free(map, free)	(_map_fre(map, free))
+void	_map_fre(map map, void (*free)(void *));
+
 #define map_clear(map)	(_map_clr(map))
 void	_map_clr(map map);

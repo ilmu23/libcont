@@ -67,7 +67,7 @@ list	_lst_new(const size_t size, const size_t count, void (*_free)(void *)) {
 			free(out);
 			return NULL;
 		}
-		out->free = (_free != free) ? _free : (void (*)(void *))__free;
+		_lst_fre(out, _free);
 		out->element_size = size;
 		out->highest_index = 0;
 		out->elements = 0;
@@ -398,6 +398,10 @@ uint8_t	_lst_rsz(list list, const size_t size) {
 
 uint8_t	_lst_stf(list list) {
 	return _lst_rsz(list, list->elements);
+}
+
+void	_lst_fre(list list, void (*_free)(void *)) {
+	list->free = (_free != free) ? _free : (void (*)(void *))__free;
 }
 
 void	_lst_clr(list list) {

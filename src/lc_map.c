@@ -53,7 +53,7 @@ map	_map_new(const size_t size, const size_t count, const map_key_type type, voi
 			free(out);
 			return NULL;
 		}
-		out->free = (_free != free) ? _free : (void (*)(void *))__free;
+		_map_fre(out, _free);
 		out->element_size = size;
 		out->capacity = count;
 		out->key_type = type;
@@ -127,6 +127,10 @@ void	_map_fea(map map, void (*fn)(void *)) {
 		if (in_use(map->data[i]))
 			fn(&map->data[i]->val);
 	}
+}
+
+void	_map_fre(map map, void (*_free)(void *)) {
+	map->free = (_free != free) ? _free : (void (*)(void *))__free;
 }
 
 void	_map_clr(map map) {

@@ -39,7 +39,7 @@ darray	_dar_new(const size_t size, const size_t count, void (*_free)(void *)) {
 			free(out);
 			return NULL;
 		}
-		out->free = (_free != free) ? _free : (void (*)(void *))__free;
+		_dar_fre(out, _free);
 		out->element_size = size;
 		out->capacity = count;
 		out->elements = 0;
@@ -145,6 +145,10 @@ uint8_t	_dar_rsz(darray arr, const size_t size) {
 
 uint8_t	_dar_stf(darray arr) {
 	return _dar_rsz(arr, arr->elements);
+}
+
+void	_dar_fre(darray arr, void (*_free)(void *)) {
+	arr->free = (_free != free) ? _free : (void (*)(void *))__free;
 }
 
 void	_dar_clr(darray arr) {
