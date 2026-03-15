@@ -400,6 +400,18 @@ uint8_t	_lst_stf(list list) {
 	return _lst_rsz(list, list->elements);
 }
 
+void	_lst_fea(list list, void (*fn)(void *)) {
+	__lst_node	*node;
+
+	if (list->elements == 0)
+		return ;
+	node = darray_get_t(__lst_node *, list->data, list->first);
+	do {
+		fn(node->node.data);
+		node = (node->next != _INDEX_NONE) ? darray_get_t(__lst_node *, list->data, node->next) : NULL;
+	} while (node);
+}
+
 void	_lst_fre(list list, void (*_free)(void *)) {
 	list->free = (_free != free) ? _free : (void (*)(void *))__free;
 }

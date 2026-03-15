@@ -147,6 +147,13 @@ uint8_t	_dar_stf(darray arr) {
 	return _dar_rsz(arr, arr->elements);
 }
 
+void	_dar_fea(darray arr, void (*fn)(void *)) {
+	size_t	i;
+
+	for (i = 0; i < arr->elements; i++)
+		fn(index(arr, i));
+}
+
 void	_dar_fre(darray arr, void (*_free)(void *)) {
 	arr->free = (_free != free) ? _free : (void (*)(void *))__free;
 }

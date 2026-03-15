@@ -80,6 +80,9 @@ uint8_t	_lst_rsz(list list, const size_t size);
 #define list_shrink_to_fit(list)	(_lst_stf(list))
 uint8_t	_lst_stf(list list);
 
+#define list_foreach(list, fn)	(_lst_fea(list, fn))
+void	_lst_fea(list list, void (*fn)(void *));
+
 #define list_set_free(list, free)	(_lst_fre(list, free))
 void	_lst_fre(list list, void (*free)(void *));
 
