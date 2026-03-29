@@ -41,7 +41,8 @@ INSTALL_PATH	=	/usr
 FILES	=	lc_alloc.c \
 			lc_darray.c \
 			lc_list.c \
-			lc_map.c
+			lc_map.c \
+			lc_utils.c
 
 
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))

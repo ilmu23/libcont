@@ -44,7 +44,7 @@ static inline size_t	_find_pair(cmap map, const uintptr_t key);
 
 static void	__free(void **blk);
 
-map	_map_new(const size_t size, const size_t count, const map_key_type type, void (*_free)(void *)) {
+map	_map_new(const size_t size, const size_t count, const map_key_type type, lc_freer free) {
 	map	out;
 
 	out = (size) ? lc_malloc(sizeof(*out)) : NULL;
@@ -54,7 +54,7 @@ map	_map_new(const size_t size, const size_t count, const map_key_type type, voi
 			lc_free(out);
 			return NULL;
 		}
-		_map_fre(out, _free);
+		_map_fre(out, free);
 		out->element_size = size;
 		out->capacity = count;
 		out->key_type = type;
@@ -130,8 +130,8 @@ void	_map_fea(map map, void (*fn)(void *)) {
 	}
 }
 
-void	_map_fre(map map, void (*_free)(void *)) {
-	map->free = (_free != lc_free) ? _free : (void (*)(void *))__free;
+void	_map_fre(map map, lc_freer free) {
+	map->free = (free != lc_free) ? free : (void (*)(void *))__free;
 }
 
 void	_map_clr(map map) {

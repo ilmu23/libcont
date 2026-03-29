@@ -12,17 +12,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct _lst *		list;
-typedef const struct _lst *	clist;
-
-typedef struct _lst_node *	list_node;
-
-struct _lst_node {
-	uint8_t	*data;
-};
+#include "defs.h"
+#include "alloc.h"
 
 #define list(type, count, free)	(_lst_new(sizeof(type), count, free))
-list	_lst_new(const size_t size, const size_t count, void (*free)(void *));
+list	_lst_new(const size_t size, const size_t count, lc_freer free);
+
+#define list_to_array(list, cpy, zero_terminate)	(_lst_to_arr(list, cpy, zero_terminate))
+void	*_lst_to_arr(clist list, lc_copyer cpy, const uint8_t zero);
+
+#define list_to_darray(list, cpy)	(_lst_to_dar(list, cpy))
+darray	_lst_to_dar(clist list, lc_copyer cpy);
+
+#define list_from_array(type, array, size, free, cpy)	(_lst_frm_arr(sizeof(type), size, array, free, cpy))
+list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, lc_freer free, lc_copyer cpy);
+
+#define list_from_darray(darray, cpy)	(darray_to_list(darray, cpy))
 
 #define list_delete(list)	(_lst_del(list))
 void	_lst_del(list list);
@@ -84,7 +89,7 @@ uint8_t	_lst_stf(list list);
 void	_lst_fea(list list, void (*fn)(void *));
 
 #define list_set_free(list, free)	(_lst_fre(list, free))
-void	_lst_fre(list list, void (*free)(void *));
+void	_lst_fre(list list, lc_freer free);
 
 #define list_clear(list)	(_lst_clr(list))
 void	_lst_clr(list list);

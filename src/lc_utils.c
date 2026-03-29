@@ -5,45 +5,38 @@
 // ██║        ██║███████╗██║     ╚██████╔╝   ██║   ╚██████╗██║  ██║██║  ██║██║  ██║
 // ╚═╝        ╚═╝╚══════╝╚═╝      ╚═════╝    ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 //
-// <<map.h>>
+// <<lc_utils.c>>
 
-#pragma once
-
-#include <stddef.h>
-#include <stdint.h>
+#include <alloca.h>
+#include <string.h>
 
 #include "defs.h"
 #include "alloc.h"
 
-#define MAP_NOT_FOUND	((void *)1)
+#include "internal/utils.h"
 
-#define map(type, count, key_type, free)	(_map_new(sizeof(type), count, key_type, free))
-map	_map_new(const size_t size, const size_t count, const map_key_type type, lc_freer free);
+static uint8_t	_simple_swap(void * const e1, void * const e2);
+static void		*_simple_copy(const void * const p);
 
-#define map_delete(map)	(_map_del(map))
-void	_map_del(map map);
+const lc_swapper	lc_simple_swap = _simple_swap;
+const lc_copyer		lc_simple_copy = _simple_copy;
 
-#define map_get(map, key)			(_map_get(map, (const uintptr_t)key))
-#define map_get_t(type, map, key)	(*(type *)_map_get(map, (const uinptr_t)key));
-void	*_map_get(cmap map, const uintptr_t key);
+size_t	simple_swap_esize;
 
-#define map_set(map, key, value)	(_map_set(map, (const uintptr_t)key, (const void *)&value))
-uint8_t	_map_set(map map, const uintptr_t key, const void *val);
+void	__free(void **blk) {
+	lc_free(*blk);
+}
 
-#define map_erase(map, key)	(_map_ers(map, (const uintptr_t)key))
-uint8_t	_map_ers(map map, const uintptr_t key);
+static uint8_t	_simple_swap(void * const e1, void * const e2) {
+	void	*buf;
 
-#define map_size(map)	(_map_sze(map))
-size_t	_map_sze(cmap map);
+	buf = alloca(simple_swap_esize);
+	memcpy(buf, e1, simple_swap_esize);
+	memcpy(e1, e2, simple_swap_esize);
+	memcpy(e2, buf, simple_swap_esize);
+	return 1;
+}
 
-#define map_empty(map)	(_map_ety(map))
-uint8_t	_map_ety(cmap map);
-
-#define map_foreach(map, fn)	(_map_fea(map, fn))
-void	_map_fea(map map, void (*fn)(void *));
-
-#define map_set_free(map, free)	(_map_fre(map, free))
-void	_map_fre(map map, lc_freer free);
-
-#define map_clear(map)	(_map_clr(map))
-void	_map_clr(map map);
+static void	*_simple_copy(const void * const p) {
+	return (void *)p;
+}

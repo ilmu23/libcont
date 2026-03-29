@@ -12,17 +12,28 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct _darray *		darray;
-typedef const struct _darray *	cdarray;
+#include "defs.h"
+#include "alloc.h"
 
 #define DARRAY_OUT_OF_BOUNDS	((void *)1)
 
 #define darray(type, count, free)	(_dar_new(sizeof(type), count, free))
-darray	_dar_new(const size_t size, const size_t count, void (*free)(void *));
+darray	_dar_new(const size_t size, const size_t count, lc_freer free);
 
 #define darray_copy(darray, cpy)					(_dar_cpy(darray, 0, SIZE_MAX, cpy))
 #define darray_copy_range(darray, start, end, cpy)	(_dar_cpy(darray, start, end, cpy))
-darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, void *(*cpy)(void *));
+darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, lc_copyer cpy);
+
+#define darray_to_array(darray, cpy, zero_terminate) (_dar_to_arr(darray, cpy, zero_terminate))
+void	*_dar_to_arr(cdarray arr, lc_copyer cpy, const uint8_t zero);
+
+#define darray_to_list(darray, cpy)	(_dar_to_lst(darray, cpy))
+list	_dar_to_lst(cdarray arr, lc_copyer cpy);
+
+#define darray_from_array(type, array, size, free, cpy)	(_dar_frm_arr(sizeof(type), size, array, free, cpy))
+darray	_dar_frm_arr(const size_t size, const size_t count, const void *arr, lc_freer free, lc_copyer cpy);
+
+#define	darray_from_list(list, cpy)	(list_to_darray(list, cpy))
 
 #define darray_delete(darray)	(_dar_del(darray))
 void	_dar_del(darray arr);
@@ -50,7 +61,7 @@ void	*_dar_get(cdarray arr, const size_t i);
 uint8_t	_dar_set(darray arr, const size_t i, const void *val, const uint8_t free);
 
 #define darray_swap(darray, i1, i2, swapper)	(_dar_swp(darray, i1, i2, swapper))
-uint8_t	_dar_swp(darray arr, const size_t i1, const size_t i2, uint8_t (*swap)(void *, void *));
+uint8_t	_dar_swp(darray arr, const size_t i1, const size_t i2, lc_swapper swap);
 
 #define darray_size(darray)		(_dar_sze(darray))
 #define darray_length(darray)	(darray_size(darray))
@@ -68,8 +79,8 @@ uint8_t	_dar_stf(darray arr);
 #define darray_foreach(darray, fn)	(_dar_fea(darray, fn))
 void	_dar_fea(darray arr, void (*fn)(void *));
 
-#define darray_set_free(darray, free)
-void	_dar_fre(darray arr, void (*free)(void *));
+#define darray_set_free(darray, free)	(_dar_fre(darray, free))
+void	_dar_fre(darray arr, lc_freer free);
 
 #define darray_clear(darray)	(_dar_clr(darray))
 void	_dar_clr(darray arr);
