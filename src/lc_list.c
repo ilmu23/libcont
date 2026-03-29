@@ -51,6 +51,8 @@ static struct {
 	uint8_t	set;
 }	_alloca_size;
 
+static inline void	_detach_node(list list, const __lst_node *node);
+
 static inline void	_set_alloca_max(void);
 
 static void	_free_node(__lst_node *node);
@@ -285,7 +287,6 @@ void	_lst_mve_b(list list, const list_node ref, const list_node node) {
 	__lst_node	*_node;
 	__lst_node	*_ref;
 	__lst_node	*prev;
-	__lst_node	*next;
 
 	if (ref == node)
 		return ;
@@ -293,27 +294,20 @@ void	_lst_mve_b(list list, const list_node ref, const list_node node) {
 	_node = get_node(node);
 	if (_node->next == _ref->index)
 		return ;
-	prev = (_node->prev != _INDEX_NONE) ? darray_get(list->data, _node->prev) : NULL;
-	next = (_node->next != _INDEX_NONE) ? darray_get(list->data, _node->next) : NULL;
-	if (prev)
-		prev->next = _node->next;
-	else
-		list->first = _node->next;
-	if (next)
-		next->prev = _node->prev;
+	_detach_node(list, _node);
 	prev = (_ref->prev != _INDEX_NONE) ? darray_get(list->data, _ref->prev) : NULL;
 	if (prev)
 		prev->next = _node->index;
+	else
+		list->first = _node->index;
 	_node->next = _ref->index;
 	_node->prev = _ref->prev;
 	_ref->prev = _node->index;
-	_ref->next = (_node->next != _ref->index) ? _node->next : _INDEX_NONE;
 }
 
 void	_lst_mve_a(list list, const list_node ref, const list_node node) {
 	__lst_node	*_node;
 	__lst_node	*_ref;
-	__lst_node	*prev;
 	__lst_node	*next;
 
 	if (ref == node)
@@ -322,23 +316,15 @@ void	_lst_mve_a(list list, const list_node ref, const list_node node) {
 	_node = get_node(node);
 	if (_node->prev == _ref->index)
 		return ;
-	prev = (_node->prev != _INDEX_NONE) ? darray_get(list->data, _node->prev) : NULL;
-	next = (_node->next != _INDEX_NONE) ? darray_get(list->data, _node->next) : NULL;
-	if (prev)
-		prev->next = _node->next;
-	else
-		list->first = _node->next;
-	if (next)
-		next->prev = _node->prev;
+	_detach_node(list, _node);
 	next = (_ref->next != _INDEX_NONE) ? darray_get(list->data, _ref->next) : NULL;
 	if (next)
 		next->prev = _node->index;
 	else
 		list->last =_node->index;
-	_node->prev = _ref->index;
 	_node->next = _ref->next;
+	_node->prev = _ref->index;
 	_ref->next = _node->index;
-	_ref->prev = (_node->prev != _ref->index) ? _node->prev : _INDEX_NONE;
 }
 
 void	_lst_ers(list list, const list_node node) {
@@ -406,10 +392,10 @@ void	_lst_fea(list list, void (*fn)(void *)) {
 
 	if (list->elements == 0)
 		return ;
-	node = darray_get_t(__lst_node *, list->data, list->first);
+	node = darray_get(list->data, list->first);
 	do {
 		fn(node->node.data);
-		node = (node->next != _INDEX_NONE) ? darray_get_t(__lst_node *, list->data, node->next) : NULL;
+		node = (node->next != _INDEX_NONE) ? darray_get(list->data, node->next) : NULL;
 	} while (node);
 }
 
@@ -423,6 +409,22 @@ void	_lst_clr(list list) {
 	list->elements = 0;
 	list->first = 0;
 	list->last = 0;
+}
+
+static inline void	_detach_node(list list, const __lst_node *node) {
+	__lst_node	*prev;
+	__lst_node	*next;
+
+	prev = (node->prev != _INDEX_NONE) ? darray_get(list->data, node->prev) : NULL;
+	next = (node->next != _INDEX_NONE) ? darray_get(list->data, node->next) : NULL;
+	if (prev)
+		prev->next = node->next;
+	else
+		list->first = node->next;
+	if (next)
+		next->prev = node->prev;
+	else
+		list->last = node->prev;
 }
 
 static inline void	_set_alloca_max(void) {
