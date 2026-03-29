@@ -93,7 +93,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 		if (!map->data[i])
 			return 0;
 	}
-	map->data[i]->key = key;
+	map->data[i]->key = _key;
 	memcpy(map->data[i]->val, val, map->element_size);
 	map->elements++;
 	return 1;
