@@ -82,11 +82,11 @@ void	*_dar_to_arr(cdarray arr, lc_copyer cpy, const uint8_t zero) {
 		return (zero) ? lc_calloc(1, arr->element_size) : NULL;
 	tmp.data = lc_malloc((arr->elements + ((zero) ? 1 : 0)) * arr->element_size);
 	if (tmp.data) {
-		if (cpy) {
-			tmp.element_size = arr->element_size;
-			for (tmp.elements = 0; tmp.elements < arr->elements; tmp.elements++)
-				_set_element(&tmp, tmp.elements, cpy(index_darr(arr, tmp.elements)));
-		} else
+		tmp.elements = 0;
+		tmp.element_size = arr->element_size;
+		if (cpy) for (; tmp.elements < arr->elements; tmp.elements++)
+			_set_element(&tmp, tmp.elements, cpy(index_darr(arr, tmp.elements)));
+		else
 			memcpy(tmp.data, arr->data, arr->elements * arr->element_size);
 		if (zero)
 			memset(index_darr(&tmp, tmp.elements), 0, tmp.element_size);
