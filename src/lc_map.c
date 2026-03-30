@@ -86,7 +86,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 		return 0;
 	_key = (map->key_type == STRING) ? _hash((const char *)key) : key;
 	i = _key % map->capacity;
-	while (in_use(map->data[i]))
+	while (in_use(map->data[i]) && map->data[i]->key != _key)
 		wraparound_increment(i, map->capacity - 1);
 	if (!in_use(map->data[i])) {
 		map->data[i] = lc_malloc(sizeof(*map->data[i]) + map->element_size);
@@ -102,7 +102,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 uint8_t	_map_ers(map map, const uintptr_t key) {
 	size_t	i;
 
-	i = _find_pair(map, key);
+	i = _find_pair(map, (map->key_type == STRING) ? _hash((const char *)key) : key);
 	if (!in_use(map->data[i]))
 		return 0;
 	if (map->free)
