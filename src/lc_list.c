@@ -32,7 +32,7 @@
 
 typedef struct {
 	struct _lst_node	node;
-	lc_freer			free;
+	lc_freer			*free;
 	size_t				index;
 	size_t				next;
 	size_t				prev;
@@ -171,7 +171,7 @@ uint8_t	_lst_psh_f(list list, const void *val) {
 	uint8_t		rv;
 
 	new = (__lst_node){
-		.free = list->free,
+		.free = &list->free,
 		.delete = 0,
 		.next = _INDEX_NONE,
 		.prev = _INDEX_NONE,
@@ -203,7 +203,7 @@ uint8_t	_lst_psh_b(list list, const void *val) {
 	uint8_t		rv;
 
 	new = (__lst_node){
-		.free = list->free,
+		.free = &list->free,
 		.delete = 0,
 		.next = _INDEX_NONE,
 		.prev = _INDEX_NONE,
@@ -304,7 +304,7 @@ uint8_t	_lst_ins_b(list list, const list_node ref, const void *val) {
 	uint8_t		rv;
 
 	new = (__lst_node){
-		.free = list->free,
+		.free = &list->free,
 		.delete = 0,
 		.node.data = lc_malloc(list->element_size)
 	};
@@ -335,7 +335,7 @@ uint8_t	_lst_ins_a(list list, const list_node ref, const void *val) {
 	uint8_t		rv;
 
 	new = (__lst_node){
-		.free = list->free,
+		.free = &list->free,
 		.delete = 0,
 		.node.data = lc_malloc(list->element_size)
 	};
@@ -513,7 +513,7 @@ static inline void	_set_alloca_max(void) {
 }
 
 static void	_free_node(__lst_node *node) {
-	if (node->free)
-		node->free(node->node.data);
+	if (*node->free)
+		(*node->free)(node->node.data);
 	lc_free(node->node.data);
 }
