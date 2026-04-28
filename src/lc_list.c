@@ -464,7 +464,7 @@ uint8_t	_lst_stf(list list) {
 	return _lst_rsz(list, list->elements);
 }
 
-void	_lst_fea(list list, const lc_list_element_fn fn, void *fn_arg) {
+void	_lst_fea(list list, const lc_foreach_fn fn, void *fn_arg) {
 	__lst_node	*node;
 
 	if (list->elements == 0)

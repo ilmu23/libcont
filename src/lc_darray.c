@@ -204,7 +204,7 @@ uint8_t	_dar_stf(darray arr) {
 	return _dar_rsz(arr, arr->elements);
 }
 
-void	_dar_fea(darray arr, const lc_darray_element_fn fn, void *fn_arg) {
+void	_dar_fea(darray arr, const lc_foreach_fn fn, void *fn_arg) {
 	size_t	i;
 
 	for (i = 0; i < arr->elements; i++)

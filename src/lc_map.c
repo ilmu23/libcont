@@ -121,12 +121,12 @@ uint8_t	_map_ety(cmap map) {
 	return (map->elements == 0) ? 1 : 0;
 }
 
-void	_map_fea(map map, const lc_map_element_fn fn, void *fn_arg) {
+void	_map_fea(map map, const lc_foreach_fn fn, void *fn_arg) {
 	size_t	i;
 
 	for (i = 0; i < map->capacity; i++) {
 		if (in_use(map->data[i]))
-			fn(map->data[i]->key, &map->data[i]->val, fn_arg);
+			fn(&map->data[i]->val, fn_arg);
 	}
 }
 

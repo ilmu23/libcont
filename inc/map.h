@@ -39,8 +39,8 @@ size_t	_map_sze(cmap map);
 #define map_empty(map)	(_map_ety(map))
 uint8_t	_map_ety(cmap map);
 
-#define map_foreach(map, fn, fn_arg)	(_map_fea(map, fn, fn_arg))
-void	_map_fea(map map, const lc_map_element_fn fn, void *fn_arg);
+#define map_foreach(map, fn, fn_arg)	(_map_fea(map, (lc_foreach_fn)fn, fn_arg))
+void	_map_fea(map map, const lc_foreach_fn fn, void *fn_arg);
 
 #define map_set_free(map, free)	(_map_fre(map, free))
 void	_map_fre(map map, const lc_freer free);

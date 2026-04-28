@@ -76,8 +76,8 @@ uint8_t	_dar_rsz(darray arr, const size_t size);
 #define darray_shrink_to_fit(darray)	(_dar_stf(darray))
 uint8_t	_dar_stf(darray arr);
 
-#define darray_foreach(darray, fn, fn_arg)	(_dar_fea(darray, fn, fn_arg))
-void	_dar_fea(darray arr, const lc_darray_element_fn fn, void *fn_arg);
+#define darray_foreach(darray, fn, fn_arg)	(_dar_fea(darray, (lc_foreach_fn)fn, fn_arg))
+void	_dar_fea(darray arr, const lc_foreach_fn fn, void *fn_arg);
 
 #define darray_set_free(darray, free)	(_dar_fre(darray, free))
 void	_dar_fre(darray arr, const lc_freer free);

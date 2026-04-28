@@ -34,9 +34,7 @@ typedef enum {
 typedef uint8_t	(*lc_swapper)(void * const, void * const);
 typedef void	*(*lc_copyer)(const void * const);
 
-typedef void	(*lc_map_element_fn)(const uintptr_t, void *, void *);
-typedef void	(*lc_darray_element_fn)(void *, void *);
-typedef void	(*lc_list_element_fn)(void *, void *);
+typedef void	(*lc_foreach_fn)(void *, void *);
 
 extern const lc_swapper	lc_simple_swap;
 extern const lc_copyer	lc_simple_copy;
