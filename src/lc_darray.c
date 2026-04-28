@@ -64,7 +64,7 @@ darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, const lc_copy
 		out->elements = (cpy) ? 0 : (arr->elements > out->capacity) ? out->capacity : arr->elements;
 		out->element_size = arr->element_size;
 		out->free = arr->free;
-		if (cpy) while (out->elements < out->capacity) {
+		if (cpy) while (out->elements < arr->elements) {
 			_set_element(out, out->elements, cpy(index_darr(arr, start + out->elements)));
 			out->elements++;
 		} else
