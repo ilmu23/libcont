@@ -32,7 +32,7 @@ struct _darray {
 
 static inline void	_set_element(darray arr, const size_t i, const void *val);
 
-darray	_dar_new(const size_t size, const size_t count, lc_freer free) {
+darray	_dar_new(const size_t size, const size_t count, const lc_freer free) {
 	darray	out;
 
 	out = (size) ? lc_malloc(sizeof(*out)) : NULL;
@@ -50,7 +50,7 @@ darray	_dar_new(const size_t size, const size_t count, lc_freer free) {
 	return out;
 }
 
-darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, lc_copyer cpy) {
+darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, const lc_copyer cpy) {
 	darray	out;
 
 	out = lc_malloc(sizeof(*out));
@@ -75,7 +75,7 @@ darray	_dar_cpy(cdarray arr, const size_t start, const size_t end, lc_copyer cpy
 	return out;
 }
 
-void	*_dar_to_arr(cdarray arr, lc_copyer cpy, const uint8_t zero) {
+void	*_dar_to_arr(cdarray arr, const lc_copyer cpy, const uint8_t zero) {
 	struct _darray	tmp;
 
 	if (arr->elements == 0)
@@ -94,16 +94,16 @@ void	*_dar_to_arr(cdarray arr, lc_copyer cpy, const uint8_t zero) {
 	return tmp.data;
 }
 
-list	_dar_to_lst(cdarray arr, lc_copyer cpy) {
-	size_t	i;
-	list	out;
+list	_dar_to_lst(cdarray arr, const lc_copyer cpy) {
+	lc_copyer	_cpy;
+	size_t		i;
+	list		out;
 
 	out = _lst_new(arr->element_size, arr->elements, arr->free);
 	if (out) {
-		if (!cpy)
-			cpy = lc_simple_copy;
+		_cpy = (cpy) ? cpy : lc_simple_copy;
 		for (i = 0; i < arr->elements; i++) {
-			if (!_lst_psh_b(out, cpy(index_darr(arr, i)))) {
+			if (!_lst_psh_b(out, _cpy(index_darr(arr, i)))) {
 				list_delete(out);
 				return NULL;
 			}
@@ -112,7 +112,7 @@ list	_dar_to_lst(cdarray arr, lc_copyer cpy) {
 	return out;
 }
 
-darray	_dar_frm_arr(const size_t size, const size_t count, const void *arr, lc_freer free, lc_copyer cpy) {
+darray	_dar_frm_arr(const size_t size, const size_t count, const void *arr, const lc_freer free, const lc_copyer cpy) {
 	darray	out;
 
 	if (count == 0)
@@ -167,16 +167,16 @@ void	*_dar_get(cdarray arr, const size_t i) {
 	return (i < arr->elements) ? index_darr(arr, i) : (i == (size_t)-1 && arr->elements) ? index_darr(arr, arr->elements - 1) : DARRAY_OUT_OF_BOUNDS;
 }
 
-uint8_t	_dar_set(darray arr, const size_t i, const void *val, const uint8_t lc_free) {
+uint8_t	_dar_set(darray arr, const size_t i, const void *val, const uint8_t free) {
 	if (i >= arr->elements)
 		return 0;
-	if (lc_free && arr->free)
+	if (free && arr->free)
 		arr->free(index_darr(arr, i));
 	_set_element(arr, i, val);
 	return 1;
 }
 
-uint8_t	_dar_swp(darray arr, const size_t i1, const size_t i2, lc_swapper swap) {
+uint8_t	_dar_swp(darray arr, const size_t i1, const size_t i2, const lc_swapper swap) {
 	if (i1 >= arr->elements || i2 >= arr->elements)
 		return 0;
 	simple_swap_esize = arr->element_size;
@@ -204,14 +204,14 @@ uint8_t	_dar_stf(darray arr) {
 	return _dar_rsz(arr, arr->elements);
 }
 
-void	_dar_fea(darray arr, void (*fn)(void *)) {
+void	_dar_fea(darray arr, const lc_darray_element_fn fn, void *fn_arg) {
 	size_t	i;
 
 	for (i = 0; i < arr->elements; i++)
-		fn(index_darr(arr, i));
+		fn(index_darr(arr, i), fn_arg);
 }
 
-void	_dar_fre(darray arr, lc_freer free) {
+void	_dar_fre(darray arr, const lc_freer free) {
 	arr->free = (free != lc_free) ? free : (void (*)(void *))__free;
 }
 

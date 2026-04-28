@@ -60,7 +60,7 @@ static inline void	_set_alloca_max(void);
 
 static void	_free_node(__lst_node *node);
 
-list	_lst_new(const size_t size, const size_t count, lc_freer free) {
+list	_lst_new(const size_t size, const size_t count, const lc_freer free) {
 	list	out;
 
 	if (!_alloca_size.set)
@@ -82,8 +82,9 @@ list	_lst_new(const size_t size, const size_t count, lc_freer free) {
 	return out;
 }
 
-void	*_lst_to_arr(clist list, lc_copyer cpy, const uint8_t zero) {
+void	*_lst_to_arr(clist list, const lc_copyer cpy, const uint8_t zero) {
 	__lst_node	*node;
+	lc_copyer	_cpy;
 	size_t		i;
 	void		*out;
 
@@ -91,12 +92,11 @@ void	*_lst_to_arr(clist list, lc_copyer cpy, const uint8_t zero) {
 		return (zero) ? lc_calloc(1, list->element_size) : NULL;
 	out = lc_malloc((list->elements + ((zero) ? 1 : 0)) * list->element_size);
 	if (out) {
-		if (!cpy)
-			cpy = lc_simple_copy;
+		_cpy = (cpy) ? cpy : lc_simple_copy;
 		i = 0;
 		node = darray_get(list->data, list->first);
 		do {
-			memcpy(index(out, i++, list->element_size), cpy(node->node.data), list->element_size);
+			memcpy(index(out, i++, list->element_size), _cpy(node->node.data), list->element_size);
 			node = (node->next != _INDEX_NONE) ? darray_get(list->data, node->next) : NULL;
 		} while (node);
 		if (zero)
@@ -105,17 +105,17 @@ void	*_lst_to_arr(clist list, lc_copyer cpy, const uint8_t zero) {
 	return out;
 }
 
-darray	_lst_to_dar(clist list, lc_copyer cpy) {
+darray	_lst_to_dar(clist list, const lc_copyer cpy) {
 	__lst_node	*node;
+	lc_copyer	_cpy;
 	darray		out;
 
 	out = _dar_new(list->element_size, list->elements, list->free);
 	if (out && list->elements) {
-		if (!cpy)
-			cpy = lc_simple_copy;
+		_cpy = (cpy) ? cpy : lc_simple_copy;
 		node = darray_get(list->data, list->first);
 		do {
-			if (!_dar_psh(out, cpy(node->node.data))) {
+			if (!_dar_psh(out, _cpy(node->node.data))) {
 				darray_delete(out);
 				return NULL;
 			}
@@ -125,8 +125,9 @@ darray	_lst_to_dar(clist list, lc_copyer cpy) {
 	return out;
 }
 
-list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, lc_freer free, lc_copyer cpy) {
-	list	out;
+list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, const lc_freer free, const lc_copyer cpy) {
+	lc_copyer	_cpy;
+	list		out;
 
 	if (count == 0)
 		return NULL;
@@ -143,10 +144,9 @@ list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, lc_fre
 		out->elements = 0;
 		out->first = 0;
 		out->last = 0;
-		if (!cpy)
-			cpy = lc_simple_copy;
+		_cpy = (cpy) ? cpy : lc_simple_copy;
 		while (out->elements < count)
-			if (!_lst_psh_b(out, cpy(index(arr, out->elements, size))))
+			if (!_lst_psh_b(out, _cpy(index(arr, out->elements, size))))
 				goto __lst_frm_arr_psh_err;
 	}
 	return out;
@@ -464,19 +464,19 @@ uint8_t	_lst_stf(list list) {
 	return _lst_rsz(list, list->elements);
 }
 
-void	_lst_fea(list list, void (*fn)(void *)) {
+void	_lst_fea(list list, const lc_list_element_fn fn, void *fn_arg) {
 	__lst_node	*node;
 
 	if (list->elements == 0)
 		return ;
 	node = darray_get(list->data, list->first);
 	do {
-		fn(node->node.data);
+		fn(node->node.data, fn_arg);
 		node = (node->next != _INDEX_NONE) ? darray_get(list->data, node->next) : NULL;
 	} while (node);
 }
 
-void	_lst_fre(list list, lc_freer free) {
+void	_lst_fre(list list, const lc_freer free) {
 	list->free = (free != lc_free) ? free : (void (*)(void *))__free;
 }
 

@@ -18,7 +18,7 @@
 #define MAP_NOT_FOUND	((void *)1)
 
 #define map(type, count, key_type, free)	(_map_new(sizeof(type), count, key_type, free))
-map	_map_new(const size_t size, const size_t count, const map_key_type type, lc_freer free);
+map	_map_new(const size_t size, const size_t count, const map_key_type type, const lc_freer free);
 
 #define map_delete(map)	(_map_del(map))
 void	_map_del(map map);
@@ -39,11 +39,11 @@ size_t	_map_sze(cmap map);
 #define map_empty(map)	(_map_ety(map))
 uint8_t	_map_ety(cmap map);
 
-#define map_foreach(map, fn)	(_map_fea(map, fn))
-void	_map_fea(map map, void (*fn)(void *));
+#define map_foreach(map, fn, fn_arg)	(_map_fea(map, fn, fn_arg))
+void	_map_fea(map map, const lc_map_element_fn fn, void *fn_arg);
 
 #define map_set_free(map, free)	(_map_fre(map, free))
-void	_map_fre(map map, lc_freer free);
+void	_map_fre(map map, const lc_freer free);
 
 #define map_clear(map)	(_map_clr(map))
 void	_map_clr(map map);

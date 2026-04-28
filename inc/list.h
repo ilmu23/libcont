@@ -16,16 +16,16 @@
 #include "alloc.h"
 
 #define list(type, count, free)	(_lst_new(sizeof(type), count, free))
-list	_lst_new(const size_t size, const size_t count, lc_freer free);
+list	_lst_new(const size_t size, const size_t count, const lc_freer free);
 
 #define list_to_array(list, cpy, zero_terminate)	(_lst_to_arr(list, cpy, zero_terminate))
-void	*_lst_to_arr(clist list, lc_copyer cpy, const uint8_t zero);
+void	*_lst_to_arr(clist list, const lc_copyer cpy, const uint8_t zero);
 
 #define list_to_darray(list, cpy)	(_lst_to_dar(list, cpy))
-darray	_lst_to_dar(clist list, lc_copyer cpy);
+darray	_lst_to_dar(clist list, const lc_copyer cpy);
 
 #define list_from_array(type, array, size, free, cpy)	(_lst_frm_arr(sizeof(type), size, array, free, cpy))
-list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, lc_freer free, lc_copyer cpy);
+list	_lst_frm_arr(const size_t size, const size_t count, const void *arr, const lc_freer free, const lc_copyer cpy);
 
 #define list_from_darray(darray, cpy)	(darray_to_list(darray, cpy))
 
@@ -85,11 +85,11 @@ uint8_t	_lst_rsz(list list, const size_t size);
 #define list_shrink_to_fit(list)	(_lst_stf(list))
 uint8_t	_lst_stf(list list);
 
-#define list_foreach(list, fn)	(_lst_fea(list, fn))
-void	_lst_fea(list list, void (*fn)(void *));
+#define list_foreach(list, fn, fn_arg)	(_lst_fea(list, fn, fn_arg))
+void	_lst_fea(list list, const lc_list_element_fn fn, void *fn_arg);
 
 #define list_set_free(list, free)	(_lst_fre(list, free))
-void	_lst_fre(list list, lc_freer free);
+void	_lst_fre(list list, const lc_freer free);
 
 #define list_clear(list)	(_lst_clr(list))
 void	_lst_clr(list list);
