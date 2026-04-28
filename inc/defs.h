@@ -27,8 +27,8 @@ struct _lst_node {
 };
 
 typedef enum {
-	STRING,
-	INTEGER
+	LC_MKEY_STRING,
+	LC_MKEY_INTEGER
 }	map_key_type;
 
 typedef uint8_t	(*lc_swapper)(void * const, void * const);

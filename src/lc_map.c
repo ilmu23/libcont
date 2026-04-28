@@ -74,7 +74,7 @@ void	_map_del(map map) {
 void	*_map_get(cmap map, const uintptr_t key) {
 	size_t	i;
 
-	i = _find_pair(map, (map->key_type == STRING) ? _hash((const char *)key) : key);
+	i = _find_pair(map, (map->key_type == LC_MKEY_STRING) ? _hash((const char *)key) : key);
 	return (in_use(map->data[i])) ? map->data[i]->val : MAP_NOT_FOUND;
 }
 
@@ -84,7 +84,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 
 	if ((map->elements * 100) / map->capacity > _GROW_THRESHOLD && !_grow(map))
 		return 0;
-	_key = (map->key_type == STRING) ? _hash((const char *)key) : key;
+	_key = (map->key_type == LC_MKEY_STRING) ? _hash((const char *)key) : key;
 	i = _key % map->capacity;
 	while (in_use(map->data[i]) && map->data[i]->key != _key)
 		wraparound_increment(i, map->capacity - 1);
@@ -102,7 +102,7 @@ uint8_t	_map_set(map map, const uintptr_t key, const void *val) {
 uint8_t	_map_ers(map map, const uintptr_t key) {
 	size_t	i;
 
-	i = _find_pair(map, (map->key_type == STRING) ? _hash((const char *)key) : key);
+	i = _find_pair(map, (map->key_type == LC_MKEY_STRING) ? _hash((const char *)key) : key);
 	if (!in_use(map->data[i]))
 		return 0;
 	if (map->free)
