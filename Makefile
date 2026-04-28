@@ -34,7 +34,7 @@ SRCDIR	=	src
 OBJDIR	=	obj
 INCDIR	=	inc
 
-INSTALL_PATH	=	/usr
+INSTALL_PATH	?=	/usr
 
 ## SOURCE FILES
 
